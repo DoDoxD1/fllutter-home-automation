@@ -10,7 +10,7 @@ class MyFloatingActionButton extends StatelessWidget {
     return FloatingActionButton(
       onPressed: (){
         // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-        context.read<Navigation>().setIndex(5);
+        context.read<Navigation>().setIndex(4);
       },
       child: Icon(Icons.add_sharp,color: Color(0xFFD1D7FF),size: 40,),
       backgroundColor: Color(0xFFF2F7FF),

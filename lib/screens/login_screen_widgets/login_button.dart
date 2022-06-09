@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sample/screens/home_page.dart';
+
+import '../../provider/navigation_provider.dart';
 
 class MyLoginButton extends StatelessWidget {
   @override
@@ -8,6 +11,7 @@ class MyLoginButton extends StatelessWidget {
       padding: const EdgeInsets.all(30),
       child: ElevatedButton(
           onPressed: () {
+            context.read<Navigation>().setIndex(0);
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage()));
           },
           style: ElevatedButton.styleFrom(

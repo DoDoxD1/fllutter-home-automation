@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sample/screens/login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
@@ -242,18 +243,23 @@ class SettingsScreen extends StatelessWidget {
           thickness: 5,
           color: Color(0xFFC2C9D1),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 30),
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            visualDensity: VisualDensity(horizontal: 0, vertical: -4),
-            leading: Icon(
-              Icons.logout_rounded,
-              color: Color(0xFFF03738),
-            ),
-            title: Text(
-              "Logout",
-              style: TextStyle(color: Color(0xFFF03738),fontWeight: FontWeight.w500,fontSize: 15),
+        InkWell(
+          onTap: (){
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(left: 30),
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              visualDensity: VisualDensity(horizontal: 0, vertical: -4),
+              leading: Icon(
+                Icons.logout_rounded,
+                color: Color(0xFFF03738),
+              ),
+              title: Text(
+                "Logout",
+                style: TextStyle(color: Color(0xFFF03738),fontWeight: FontWeight.w500,fontSize: 15),
+              ),
             ),
           ),
         ),

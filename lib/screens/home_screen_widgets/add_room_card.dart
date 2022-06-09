@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sample/screens/add_device_screen.dart';
 
 class AddRoomCard extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -21,49 +21,52 @@ class AddRoomCard extends StatelessWidget {
                 ),
               ],
             ),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.only(left: 20,top: 20),
-                    child: Text(
-                      "Add Room",
-                      style: TextStyle(
-                          fontSize: 21, fontWeight: FontWeight.w500),
-                    ),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              InkWell(
+                child: Container(
+                  padding: const EdgeInsets.only(left: 20, top: 20),
+                  child: Text(
+                    "Add Room",
+                    style: TextStyle(fontSize: 21, fontWeight: FontWeight.w500),
                   ),
-                  const Divider(
-                    height: 20,
-                    thickness: 1,
-                    indent: 20,
-                    endIndent: 20,
-                    color: Color(0xFFC2C9D1),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20,top: 20),
-                    child: Text(
-                      "Add Group",
-                      style: TextStyle(
-                          fontSize: 21, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  const Divider(
-                    height: 20,
-                    thickness: 1,
-                    indent: 20,
-                    endIndent: 20,
-                    color: Color(0xFFC2C9D1),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20,top: 20),
-                    child: Text(
-                      "Add Floor",
-                      style: TextStyle(
-                          fontSize: 21, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  SizedBox(height: 100,)
-                ]),
+                ),
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>AddFloorPage()));
+                },
+              ),
+              const Divider(
+                height: 20,
+                thickness: 1,
+                indent: 20,
+                endIndent: 20,
+                color: Color(0xFFC2C9D1),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, top: 20),
+                child: Text(
+                  "Add Group",
+                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w500),
+                ),
+              ),
+              const Divider(
+                height: 20,
+                thickness: 1,
+                indent: 20,
+                endIndent: 20,
+                color: Color(0xFFC2C9D1),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, top: 20),
+                child: Text(
+                  "Add Floor",
+                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w500),
+                ),
+              ),
+              SizedBox(
+                height: 100,
+              ),
+            ]),
           ),
         ),
       ],

@@ -8,5 +8,6 @@ class BoardProvider with ChangeNotifier {
 
   void setBoard(var board) {
     _board = board;
+    notifyListeners();
   }
 }

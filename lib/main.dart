@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Readymotive",
-      home: LoginScreen(),
+      home: MyOnBoardScree(),
     );
   }
 }

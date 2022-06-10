@@ -245,7 +245,22 @@ class SettingsScreen extends StatelessWidget {
         ),
         InkWell(
           onTap: (){
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+            // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+            Navigator.pushReplacement(context, PageRouteBuilder(
+              transitionDuration: Duration(seconds: 1),
+              transitionsBuilder: (context, animation, animationTime,
+                  child) {
+                animation = CurvedAnimation(parent: animation, curve: Curves.decelerate);
+                return ScaleTransition(
+                  alignment: Alignment.center,
+                  scale: animation,
+                  child: child,
+                );
+              },
+              pageBuilder: (context, animation, animationTime) {
+                return LoginScreen();
+              },
+            ));
           },
           child: Padding(
             padding: const EdgeInsets.only(left: 30),

@@ -11,7 +11,22 @@ class ThreeRoomsCard extends StatelessWidget {
         children: [
           InkWell(
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => MyRoomPage()));
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => MyRoomPage()));
+              Navigator.push(context, PageRouteBuilder(
+                transitionDuration: Duration(seconds: 1),
+                transitionsBuilder: (context, animation, animationTime,
+                    child) {
+                  animation = CurvedAnimation(parent: animation, curve: Curves.easeInSine);
+                  return ScaleTransition(
+                    alignment: Alignment.center,
+                    scale: animation,
+                    child: child,
+                  );
+                },
+                pageBuilder: (context, animation, animationTime) {
+                  return MyRoomPage();
+                },
+              ));
             },
             child: Stack(
               alignment: Alignment.center,

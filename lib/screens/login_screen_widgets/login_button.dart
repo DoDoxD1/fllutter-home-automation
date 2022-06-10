@@ -12,7 +12,22 @@ class MyLoginButton extends StatelessWidget {
       child: ElevatedButton(
           onPressed: () {
             context.read<Navigation>().setIndex(0);
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+            // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+            Navigator.pushReplacement(context, PageRouteBuilder(
+              transitionDuration: Duration(seconds: 1),
+              transitionsBuilder: (context, animation, animationTime,
+                  child) {
+                animation = CurvedAnimation(parent: animation, curve: Curves.elasticOut);
+                return ScaleTransition(
+                  alignment: Alignment.center,
+                  scale: animation,
+                  child: child,
+                );
+              },
+              pageBuilder: (context, animation, animationTime) {
+                return MyHomePage();
+              },
+            ));
           },
           style: ElevatedButton.styleFrom(
             primary: Color(0xFF5468FF),

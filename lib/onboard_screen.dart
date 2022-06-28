@@ -13,19 +13,23 @@ class MyOnBoardScree extends StatelessWidget {
           if (details.delta.dx < 0) {
             if (context.read<BoardProvider>().board == 'assets/board1.png') {
               context.read<BoardProvider>().setBoard('assets/board2.png');
-            } else if (context.read<BoardProvider>().board ==
-                'assets/board2.png') {
-              context.read<BoardProvider>().setBoard('assets/board3.png');
-            } else
+            }
+            // else if (context.read<BoardProvider>().board ==
+            //     'assets/board2.png') {
+            //   context.read<BoardProvider>().setBoard('assets/board3.png');
+            // }
+            else
               return;
           }
           if (details.delta.dy < 0) {
-            if (context.read<BoardProvider>().board == 'assets/board3.png') {
-              context.read<BoardProvider>().setBoard('assets/board2.png');
-            } else if (context.read<BoardProvider>().board ==
+            // if (context.read<BoardProvider>().board == 'assets/board3.png') {
+            //   context.read<BoardProvider>().setBoard('assets/board2.png');
+            // }
+            if (context.read<BoardProvider>().board ==
                 'assets/board2.png') {
               context.read<BoardProvider>().setBoard('assets/board1.png');
-            } else
+            }
+            else
               return;
           }
         },

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+// import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class MyLoginTextfield extends StatelessWidget {
 
@@ -13,24 +13,24 @@ class MyLoginTextfield extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
-        child: InternationalPhoneNumberInput(
-          onInputChanged: (value) {},
-          inputDecoration: InputDecoration(
-            hintStyle: TextStyle(color: Color(0xFFC2C9D1)),
-            hintText: "Phone Number",
-            border: InputBorder.none
-          ),
-          maxLength: 10,
-          selectorTextStyle: TextStyle(
-              fontSize: 21,
-              fontWeight: FontWeight.w700,
-              fontFamily: 'lato'),
-          textStyle: TextStyle(
-              fontSize: 21,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'lato'),
-          spaceBetweenSelectorAndTextField: 0,
-        ),
+        // child: InternationalPhoneNumberInput(
+        //   onInputChanged: (value) {},
+        //   inputDecoration: InputDecoration(
+        //     hintStyle: TextStyle(color: Color(0xFFC2C9D1)),
+        //     hintText: "Phone Number",
+        //     border: InputBorder.none
+        //   ),
+        //   maxLength: 10,
+        //   selectorTextStyle: TextStyle(
+        //       fontSize: 21,
+        //       fontWeight: FontWeight.w700,
+        //       fontFamily: 'lato'),
+        //   textStyle: TextStyle(
+        //       fontSize: 21,
+        //       fontWeight: FontWeight.w500,
+        //       fontFamily: 'lato'),
+        //   spaceBetweenSelectorAndTextField: 0,
+        // ),
       ),
     );
   }

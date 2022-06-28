@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sample/onboard_screen.dart';
 import 'package:sample/provider/board_provider.dart';
+import 'package:sample/provider/message_provider.dart';
 import 'package:sample/provider/navigation_provider.dart';
 import 'package:flutter/services.dart';
+import 'package:sample/provider/newThing_provider.dart';
+import 'package:sample/provider/things_provider.dart';
+import 'package:sample/screens/devices_screen.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -14,6 +18,9 @@ void main() {
     providers: [
       ChangeNotifierProvider(create: (_) => Navigation()),
       ChangeNotifierProvider(create: (_) => BoardProvider()),
+      ChangeNotifierProvider(create: (_) => ThingsList()),
+      ChangeNotifierProvider(create: (_) => ThingName()),
+      ChangeNotifierProvider(create: (_) => Messages()),
     ],
     child: MyApp(),
   ));
@@ -25,7 +32,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Readymotive",
-      home: MyOnBoardScree(),
+      home: DeviceScreen(),
     );
   }
 }

@@ -5,6 +5,8 @@ import 'package:sample/screens/login_screen_widgets/login_textfield.dart';
 import 'package:sample/screens/signup_screen.dart';
 
 class LoginScreen extends StatelessWidget {
+  final TextEditingController controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,15 +38,27 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               children: [
                 Image.asset('assets/login.png'),
-                MyLoginTextfield(),
-                MyLoginButton(),
+                // MyLoginTextfield(),
+                Padding(
+                  padding: const EdgeInsets.only(left: 32,right: 32,top: 8),
+                  child: TextField(
+                    controller: controller,
+                    decoration: InputDecoration(hintText: 'Enter your name'),
+                  ),
+                ),
+                MyLoginButton(
+                  controller: controller,
+                ),
                 MyLoginwith(),
                 SizedBox(
                   height: 100,
                 ),
                 InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => SignupScreen()));
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SignupScreen()));
                   },
                   child: Text(
                     "SIGNUP FOR A NEW ACCOUNT",

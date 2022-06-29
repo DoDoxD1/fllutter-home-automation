@@ -98,8 +98,8 @@ class ManageThingActivity extends StatelessWidget {
 
   ListThingsResponse listThingsResponse = new ListThingsResponse();
   AwsClientCredentials awsClientCredentials = new AwsClientCredentials(
-      accessKey: "AKIA4DLDDHWDD4XN5NHU",
-      secretKey: "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");
+      accessKey: "AKIA4DLDDHWDGTI74QPG",
+      secretKey: "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");
   late IoT iot =
       new IoT(region: "us-east-1", credentials: awsClientCredentials);
 

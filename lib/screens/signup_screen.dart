@@ -3,10 +3,12 @@ import 'package:sample/screens/login_screen.dart';
 import 'package:sample/screens/login_screen_widgets/login_button.dart';
 import 'package:sample/screens/login_screen_widgets/login_loginwith.dart';
 import 'package:sample/screens/login_screen_widgets/login_textfield.dart';
+import 'package:sample/screens/signup_screen_widgets/MySignUpButton.dart';
 import 'package:sample/screens/signup_screen_widgets/signup_textfield_name.dart';
 import 'package:sample/screens/signup_screen_widgets/signup_prefrence.dart';
 
 class SignupScreen extends StatelessWidget {
+  final TextEditingController controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,8 +17,9 @@ class SignupScreen extends StatelessWidget {
         backgroundColor: Colors.indigo.shade50,
         appBar: AppBar(
           leading: InkWell(
-            onTap: (){
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
+            onTap: () {
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()));
             },
             child: Padding(
               padding: const EdgeInsets.only(left: 16),
@@ -45,17 +48,18 @@ class SignupScreen extends StatelessWidget {
           child: Center(
             child: Column(
               children: [
-                MyLoginTextfield(),
-                MySignupNameTextfield(),
-                MySignupPreference(),
-                MyLoginButton(),
+                // MyLoginTextfield(),
+                MySignupNameTextfield(controller: controller,),
+                // MySignupPreference(),
+                MySignUpButton(controller: controller,),
                 MyLoginwith(),
                 SizedBox(
                   height: 100,
                 ),
                 InkWell(
-                  onTap: (){
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
+                  onTap: () {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()));
                   },
                   child: Text(
                     "I ALREADY HAVE AN ACCOUNT",

@@ -3,8 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:sample/screens/home_page.dart';
 
 import '../../provider/navigation_provider.dart';
+import '../devices_screen.dart';
 
 class MyLoginButton extends StatelessWidget {
+  TextEditingController controller;
+  MyLoginButton({Key? key, required this.controller}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -13,6 +16,13 @@ class MyLoginButton extends StatelessWidget {
           onPressed: () {
             context.read<Navigation>().setIndex(0);
             // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+            if(controller.text.toString().isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("Enter your name"),
+              ));
+              return;
+            }
+            else
             Navigator.pushReplacement(context, PageRouteBuilder(
               transitionDuration: Duration(seconds: 1),
               transitionsBuilder: (context, animation, animationTime,
@@ -25,7 +35,7 @@ class MyLoginButton extends StatelessWidget {
                 );
               },
               pageBuilder: (context, animation, animationTime) {
-                return MyHomePage();
+                return DeviceScreen(uid: controller.text.toString());
               },
             ));
           },

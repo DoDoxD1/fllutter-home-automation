@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MySignupNameTextfield extends StatelessWidget {
+  TextEditingController controller;
+  MySignupNameTextfield({Key? key, required this.controller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +17,7 @@ class MySignupNameTextfield extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(left: 8),
           child: TextField(
+            controller: controller,
             style: TextStyle(
               fontSize: 21,
               fontWeight: FontWeight.w500,

@@ -2,10 +2,12 @@ import 'package:aws_iot_api/iot-2015-05-28.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sample/provider/things_provider.dart';
-import 'package:sample/screens/home_screen_2.dart';
 import 'package:sample/screens/manageThingScreen.dart';
 
 class DeviceScreen extends StatelessWidget {
+  final String uid;
+
+  DeviceScreen({Key? key, required this.uid}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,13 +44,30 @@ class DeviceScreen extends StatelessWidget {
           )
         ],
       ),
-      body: DeviceScreenBody(),
+      body: DeviceScreenBody(uid:uid),
     );
   }
 }
 
-class DeviceScreenBody extends StatelessWidget {
+class DeviceScreenBody extends StatefulWidget {
+  final String uid;
+
+  DeviceScreenBody({Key? key, required this.uid}) : super(key: key);
+  @override
+  State<DeviceScreenBody> createState() => _DeviceScreenBodyState(uid: uid);
+}
+
+class _DeviceScreenBodyState extends State<DeviceScreenBody> {
+  final String uid;
+
+  _DeviceScreenBodyState({Key? key, required this.uid});
   late TextEditingController controller=TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    list_things(context,uid);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +100,7 @@ class DeviceScreenBody extends StatelessWidget {
             children: [
               ElevatedButton(
                   onPressed: () {
-                    list_things(context);
+                    list_things(context,uid);
                   },
                   child: Text("Refresh things")),
               ElevatedButton(
@@ -95,19 +114,21 @@ class DeviceScreenBody extends StatelessWidget {
       ),
     );
   }
+
   AwsClientCredentials awsClientCredentials = new AwsClientCredentials(
-      accessKey: "AKIA4DLDDHWDD4XN5NHU",
-      secretKey: "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");
+      accessKey: "AKIA4DLDDHWDGTI74QPG",
+      secretKey: "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");
+
   late IoT iot =
       new IoT(region: "us-east-1", credentials: awsClientCredentials);
 
-  void list_things(BuildContext context) async {
-    ListThingsResponse listThingsResponse = new ListThingsResponse();
-    listThingsResponse = await iot.listThings();
-
+  void list_things(BuildContext context,String uid) async {
+    ListThingsInThingGroupResponse listThingsResponse = new ListThingsInThingGroupResponse();
+    listThingsResponse = await iot.listThingsInThingGroup(thingGroupName: uid);
+    print(uid);
     listThingsResponse.things?.forEach((element) {
-      print("${element.thingName} \n");
-      context.read<ThingsList>().addThing(element);
+      print("${element} \n");
+      context.read<ThingsList>().addThing(ThingAttribute(thingName: element));
     });
   }
 
@@ -134,7 +155,8 @@ class DeviceScreenBody extends StatelessWidget {
   void create_thing(BuildContext context) async{
     CreateThingResponse createThingResponse = new CreateThingResponse();
     try{
-      createThingResponse = await iot.createThing(thingName: controller.text);
+      createThingResponse = await iot.createThing(thingName: controller.text.toString());
+      await iot.addThingToThingGroup(thingGroupName: uid, thingName: controller.text.toString());
     }
     catch(e){
       print(e);
@@ -143,6 +165,7 @@ class DeviceScreenBody extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Thing created successfuly"),
       ));
+      list_things(context, uid);
     }
     else{
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:sample/provider/newThing_provider.dart';
 import 'package:sample/provider/things_provider.dart';
 import 'package:sample/screens/devices_screen.dart';
+import 'package:sample/screens/login_screen.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Readymotive",
-      home: DeviceScreen(),
+      home: LoginScreen(),
     );
   }
 }

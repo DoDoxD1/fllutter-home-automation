@@ -9,16 +9,20 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:provider/provider.dart';
 import 'package:sample/provider/message_provider.dart';
+import 'package:sample/provider/thingTypeProvider.dart';
 import 'package:sample/provider/things_provider.dart';
 
 class ManageThingActivity extends StatelessWidget {
   final ThingAttribute thing;
 
   ManageThingActivity({Key? key, required this.thing}) : super(key: key);
-  late TextEditingController controller=TextEditingController();
+  late TextEditingController controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    final thingsList = context.watch<ThingsList>().thingsList;
+    // final thingsList = context.watch<ThingsList>().thingsList;
+    final List<String> thingsList =<String> ["one","two"];
+    final thingTypes = context.watch<ThingType>().thingTypeList;
     final msg = context.watch<Messages>().msg;
     return WillPopScope(
       onWillPop: () async {
@@ -88,6 +92,25 @@ class ManageThingActivity extends StatelessWidget {
                       },
                       child: Text("Send Message"))
                 ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Text("Thing type"),
+                    DropdownButton(
+                      items: thingTypes.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        context.read<ThingType>().setThingType(value.toString());
+                      },
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -203,14 +226,14 @@ class ManageThingActivity extends StatelessWidget {
                   child: Text("CANCEL")),
               TextButton(
                   onPressed: () {
-                    send_msg("flutter",context);
+                    send_msg("flutter", context);
                   },
                   child: Text("Send")),
             ],
           ));
 
-  void send_msg(String uniqueId,BuildContext buildContext) async{
-    if(controller.text.isEmpty){
+  void send_msg(String uniqueId, BuildContext buildContext) async {
+    if (controller.text.isEmpty) {
       ScaffoldMessenger.of(buildContext).showSnackBar(SnackBar(
         content: Text("Please enter the temperature"),
       ));
@@ -226,7 +249,7 @@ class ManageThingActivity extends StatelessWidget {
     context.usePrivateKeyBytes(privateKey.buffer.asUint8List());
 
     final MqttServerClient client =
-    MqttServerClient('a1gsbdcd7xwjfd-ats.iot.us-east-1.amazonaws.com', '');
+        MqttServerClient('a1gsbdcd7xwjfd-ats.iot.us-east-1.amazonaws.com', '');
 
     client.securityContext = context;
     client.logging(on: true);
@@ -238,7 +261,7 @@ class ManageThingActivity extends StatelessWidget {
     client.pongCallback = pong;
 
     final MqttConnectMessage connMess =
-    MqttConnectMessage().withClientIdentifier(uniqueId).startClean();
+        MqttConnectMessage().withClientIdentifier(uniqueId).startClean();
     client.connectionMessage = connMess;
 
     await client.connect();
@@ -253,19 +276,17 @@ class ManageThingActivity extends StatelessWidget {
     bool sent = true;
     final builder = MqttClientPayloadBuilder();
     builder.addString('{"temperature": "${controller.text}"}');
-    try{
+    try {
       client.publishMessage(topic, MqttQos.atLeastOnce, builder.payload!);
-    }
-    catch(e){
-      sent=false;
+    } catch (e) {
+      sent = false;
       print(e);
     }
-    if(sent){
+    if (sent) {
       ScaffoldMessenger.of(buildContext).showSnackBar(SnackBar(
         content: Text("Sent temperature successfuly"),
       ));
-    }
-    else{
+    } else {
       ScaffoldMessenger.of(buildContext).showSnackBar(SnackBar(
         content: Text("Error in sending the temperature"),
       ));
@@ -273,4 +294,10 @@ class ManageThingActivity extends StatelessWidget {
     Navigator.of(buildContext).pop();
     controller.clear();
   }
+
+  DropdownMenuItem<String> buildMenuItem(String item)=>
+      DropdownMenuItem(
+          value: item,
+          child: Text(item),
+      );
 }

@@ -1,5 +1,6 @@
 import 'package:aws_iot_api/iot-2015-05-28.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:sample/provider/things_provider.dart';
 import 'package:sample/screens/manageThingScreen.dart';
@@ -8,6 +9,7 @@ class DeviceScreen extends StatelessWidget {
   final String uid;
 
   DeviceScreen({Key? key, required this.uid}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +46,7 @@ class DeviceScreen extends StatelessWidget {
           )
         ],
       ),
-      body: DeviceScreenBody(uid:uid),
+      body: DeviceScreenBody(uid: uid),
     );
   }
 }
@@ -53,63 +55,79 @@ class DeviceScreenBody extends StatefulWidget {
   final String uid;
 
   DeviceScreenBody({Key? key, required this.uid}) : super(key: key);
+
   @override
   State<DeviceScreenBody> createState() => _DeviceScreenBodyState(uid: uid);
 }
+
+bool loading = true;
 
 class _DeviceScreenBodyState extends State<DeviceScreenBody> {
   final String uid;
 
   _DeviceScreenBodyState({Key? key, required this.uid});
-  late TextEditingController controller=TextEditingController();
+
+  late TextEditingController controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    list_things(context,uid);
+    list_things(context, uid);
   }
 
   @override
   Widget build(BuildContext context) {
-
     final thingsList = context.watch<ThingsList>().thingsList;
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Text(
-            "Things list",
-            style: TextStyle(fontSize: 18),
-          ),
-          Expanded(
-            child: ListView.builder(
-                itemCount: context.watch<ThingsList>().thingsList.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(thingsList[index].thingName.toString()),
-                    onTap: (){
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ManageThingActivity(thing: thingsList[index],)));
-                    },
-                  );
-                },),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ElevatedButton(
-                  onPressed: () {
-                    list_things(context,uid);
+              Text(
+                "Things list",
+                style: TextStyle(fontSize: 18),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: context.watch<ThingsList>().thingsList.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(thingsList[index].thingName.toString()),
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ManageThingActivity(
+                                  thing: thingsList[index],
+                                )));
+                      },
+                    );
                   },
-                  child: Text("Refresh things")),
-              ElevatedButton(
-                  onPressed: () {
-                    openDialog(context);
-                  },
-                  child: Text("Add thing"))
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        list_things(context, uid);
+                      },
+                      child: Text("Refresh things")),
+                  ElevatedButton(
+                      onPressed: () {
+                        openDialog(context);
+                      },
+                      child: Text("Add thing"))
+                ],
+              )
             ],
-          )
+          ),
+          if (loading)
+            SpinKitWanderingCubes(
+              size: 70,
+              color: Colors.lightBlue,
+            ),
         ],
       ),
     );
@@ -122,14 +140,16 @@ class _DeviceScreenBodyState extends State<DeviceScreenBody> {
   late IoT iot =
       new IoT(region: "us-east-1", credentials: awsClientCredentials);
 
-  void list_things(BuildContext context,String uid) async {
-    ListThingsInThingGroupResponse listThingsResponse = new ListThingsInThingGroupResponse();
+  void list_things(BuildContext context, String uid) async {
+    loading = true;
+    ListThingsInThingGroupResponse listThingsResponse =
+        new ListThingsInThingGroupResponse();
     listThingsResponse = await iot.listThingsInThingGroup(thingGroupName: uid);
-    print(uid);
     listThingsResponse.things?.forEach((element) {
       print("${element} \n");
       context.read<ThingsList>().addThing(ThingAttribute(thingName: element));
     });
+    loading = false;
   }
 
   Future openDialog(BuildContext context) => showDialog(
@@ -142,32 +162,36 @@ class _DeviceScreenBodyState extends State<DeviceScreenBody> {
               decoration: InputDecoration(hintText: 'Enter name of thing'),
             ),
             actions: [
-              TextButton(onPressed: () {
-                Navigator.of(context).pop();
-                controller.clear();
-              }, child: Text("CANCEL")),
-              TextButton(onPressed: () {
-                create_thing(context);
-              }, child: Text("CREATE")),
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    controller.clear();
+                  },
+                  child: Text("CANCEL")),
+              TextButton(
+                  onPressed: () {
+                    create_thing(context);
+                  },
+                  child: Text("CREATE")),
             ],
           ));
 
-  void create_thing(BuildContext context) async{
+  void create_thing(BuildContext context) async {
     CreateThingResponse createThingResponse = new CreateThingResponse();
-    try{
-      createThingResponse = await iot.createThing(thingName: controller.text.toString());
-      await iot.addThingToThingGroup(thingGroupName: uid, thingName: controller.text.toString());
-    }
-    catch(e){
+    try {
+      createThingResponse =
+          await iot.createThing(thingName: controller.text.toString());
+      await iot.addThingToThingGroup(
+          thingGroupName: uid, thingName: controller.text.toString());
+    } catch (e) {
       print(e);
     }
-    if(createThingResponse.thingId!=null){
+    if (createThingResponse.thingId != null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Thing created successfuly"),
       ));
       list_things(context, uid);
-    }
-    else{
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Error occured while creating thing"),
       ));

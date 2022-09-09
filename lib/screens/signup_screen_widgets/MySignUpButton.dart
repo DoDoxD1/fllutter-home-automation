@@ -91,7 +91,7 @@ void signup_user(BuildContext context, TextEditingController controller) {
             );
           },
           pageBuilder: (context, animation, animationTime) {
-            return DeviceScreen(uid: controller.text.toString());
+            return DeviceScreen(uid: controller.text.toString(),accessToken: "",);
           },
         ));
   else{

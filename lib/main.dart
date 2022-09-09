@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:sample/provider/newThing_provider.dart';
 import 'package:sample/provider/thingTypeProvider.dart';
 import 'package:sample/provider/things_provider.dart';
+import 'package:sample/provider/used_nodes_provider.dart';
 import 'package:sample/screens/devices_screen.dart';
 import 'package:sample/screens/login_screen.dart';
 import 'package:sample/screens/thing_types_screen.dart';
@@ -25,6 +26,7 @@ void main() {
       ChangeNotifierProvider(create: (_) => ThingName()),
       ChangeNotifierProvider(create: (_) => Messages()),
       ChangeNotifierProvider(create: (_) => ThingType()),
+      ChangeNotifierProvider(create: (_) => UserNodesProvider()),
     ],
     child: MyApp(),
   ));

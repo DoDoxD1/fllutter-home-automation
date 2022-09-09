@@ -6,6 +6,7 @@ import 'package:sample/screens/signup_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController controller = TextEditingController();
+  final TextEditingController controller_pass = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +44,19 @@ class LoginScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 32,right: 32,top: 8),
                   child: TextField(
                     controller: controller,
-                    decoration: InputDecoration(hintText: 'Enter your name'),
+                    decoration: InputDecoration(hintText: 'Enter your email id'),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 32,right: 32,top: 8),
+                  child: TextField(
+                    controller: controller_pass,
+                    decoration: InputDecoration(hintText: 'Enter your password'),
                   ),
                 ),
                 MyLoginButton(
                   controller: controller,
+                  controller_pass: controller_pass,
                 ),
                 MyLoginwith(),
                 SizedBox(

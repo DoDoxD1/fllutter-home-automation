@@ -2,13 +2,20 @@ import 'package:aws_iot_api/iot-2015-05-28.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import 'package:sample/provider/nodes_provider.dart';
 import 'package:sample/provider/things_provider.dart';
+import 'package:sample/provider/used_nodes_provider.dart';
 import 'package:sample/screens/manageThingScreen.dart';
+import 'package:sample/services/api_services.dart';
+
+import '../models/node.dart';
+import '../models/user_nodes.dart';
 
 class DeviceScreen extends StatelessWidget {
   final String uid;
+  final String?  accessToken;
 
-  DeviceScreen({Key? key, required this.uid}) : super(key: key);
+  DeviceScreen({Key? key, required this.uid, required this.accessToken}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,46 +45,59 @@ class DeviceScreen extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(right: 20),
-            child: Icon(
-              Icons.shopping_cart_outlined,
-              color: Color(0xFF344356),
-              size: 30,
+            child: ElevatedButton(
+              onPressed: ()=>{
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text("Add device will be available soon!"),
+              ))
+              },
+              child: Icon(
+                Icons.add,
+                color: Color(0xFF344356),
+                size: 30,
+              ),
             ),
           )
         ],
       ),
-      body: DeviceScreenBody(uid: uid),
+      body: DeviceScreenBody(uid: uid,accessToken: accessToken,),
     );
   }
 }
 
 class DeviceScreenBody extends StatefulWidget {
   final String uid;
+  final String? accessToken;
 
-  DeviceScreenBody({Key? key, required this.uid}) : super(key: key);
+  DeviceScreenBody({Key? key, required this.uid, required this.accessToken}) : super(key: key);
 
   @override
-  State<DeviceScreenBody> createState() => _DeviceScreenBodyState(uid: uid);
+  State<DeviceScreenBody> createState() => _DeviceScreenBodyState(uid: uid,accessToken: accessToken);
 }
 
 bool loading = true;
 
 class _DeviceScreenBodyState extends State<DeviceScreenBody> {
   final String uid;
+  final String? accessToken;
 
-  _DeviceScreenBodyState({Key? key, required this.uid});
+  _DeviceScreenBodyState({Key? key, required this.uid, required this.accessToken});
 
   late TextEditingController controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    list_things(context, uid);
+    list_things(context, uid, accessToken);
   }
 
   @override
   Widget build(BuildContext context) {
-    final thingsList = context.watch<ThingsList>().thingsList;
+    // final thingsList = context.watch<ThingsList>().thingsList;
+    final userNode1 = context.watch<UserNodesProvider>().node;
+    final nodeDevices = context.watch<UserNodesProvider>().node.devices;
+
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(
@@ -87,40 +107,39 @@ class _DeviceScreenBodyState extends State<DeviceScreenBody> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Things list",
+                "All devices",
                 style: TextStyle(fontSize: 18),
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: context.watch<ThingsList>().thingsList.length,
+                  itemCount: context.watch<UserNodesProvider>().node.devices.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(thingsList[index].thingName.toString()),
+                      title: Text(nodeDevices[index].name.toString()),
+                      trailing: userNode1.isConnected? Text("Connected"):Text("Not Connected"),
                       onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => ManageThingActivity(
-                                  thing: thingsList[index],
-                                )));
+                        // bool ison=false;
+                        // if(ison){
+                        //   ison = ture;
+                        //   msg = "Device will be turned on";
+                        // }
+                        // else{
+                        //   ison = false;
+                        //   msg = "Device will be turned "
+                        // }
+                        if(userNode1.isConnected==false)
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("Device not connected!"),
+                        ));
+                        // Navigator.of(context).push(MaterialPageRoute(
+                        //     builder: (context) => ManageThingActivity(
+                        //           thing: userNodes.nodes[index].toString(),
+                        //         )));
                       },
                     );
                   },
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                      onPressed: () {
-                        list_things(context, uid);
-                      },
-                      child: Text("Refresh things")),
-                  ElevatedButton(
-                      onPressed: () {
-                        openDialog(context);
-                      },
-                      child: Text("Add thing"))
-                ],
-              )
             ],
           ),
           if (loading)
@@ -133,70 +152,18 @@ class _DeviceScreenBodyState extends State<DeviceScreenBody> {
     );
   }
 
-  AwsClientCredentials awsClientCredentials = new AwsClientCredentials(
-      accessKey: "AKIA4DLDDHWDGTI74QPG",
-      secretKey: "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");
+  void list_things(BuildContext context, String uid, String? accessToken) async {
+    UserNodes? userNodes = await ApiSerivice().getNodes(accessToken);
 
-  late IoT iot =
-      new IoT(region: "us-east-1", credentials: awsClientCredentials);
-
-  void list_things(BuildContext context, String uid) async {
-    loading = true;
-    ListThingsInThingGroupResponse listThingsResponse =
-        new ListThingsInThingGroupResponse();
-    listThingsResponse = await iot.listThingsInThingGroup(thingGroupName: uid);
-    listThingsResponse.things?.forEach((element) {
-      print("${element} \n");
-      context.read<ThingsList>().addThing(ThingAttribute(thingName: element));
-    });
     loading = false;
-  }
 
-  Future openDialog(BuildContext context) => showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-            title: Text('Thing Name'),
-            content: TextField(
-              autofocus: true,
-              controller: controller,
-              decoration: InputDecoration(hintText: 'Enter name of thing'),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    controller.clear();
-                  },
-                  child: Text("CANCEL")),
-              TextButton(
-                  onPressed: () {
-                    create_thing(context);
-                  },
-                  child: Text("CREATE")),
-            ],
-          ));
+    print(userNodes?.nodes[0]);
 
-  void create_thing(BuildContext context) async {
-    CreateThingResponse createThingResponse = new CreateThingResponse();
-    try {
-      createThingResponse =
-          await iot.createThing(thingName: controller.text.toString());
-      await iot.addThingToThingGroup(
-          thingGroupName: uid, thingName: controller.text.toString());
-    } catch (e) {
-      print(e);
-    }
-    if (createThingResponse.thingId != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Thing created successfuly"),
-      ));
-      list_things(context, uid);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Error occured while creating thing"),
-      ));
-    }
-    Navigator.of(context).pop();
-    controller.clear();
+    Node? node = await ApiSerivice().getNodeDetails(accessToken, userNodes?.nodes[0]);
+
+    print(node?.devices[0].name);
+
+    context.read<UserNodesProvider>().updateNodesList(userNodes!);
+    context.read<UserNodesProvider>().updateNodeDetails(node!);
   }
 }

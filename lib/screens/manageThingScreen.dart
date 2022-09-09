@@ -12,17 +12,31 @@ import 'package:sample/provider/message_provider.dart';
 import 'package:sample/provider/thingTypeProvider.dart';
 import 'package:sample/provider/things_provider.dart';
 
-class ManageThingActivity extends StatelessWidget {
+class ManageThingActivity extends StatefulWidget {
   final ThingAttribute thing;
 
   ManageThingActivity({Key? key, required this.thing}) : super(key: key);
+
+  @override
+  State<ManageThingActivity> createState() => _ManageThingActivityState();
+}
+
+class _ManageThingActivityState extends State<ManageThingActivity> {
   late TextEditingController controller = TextEditingController();
 
   @override
+  void initState(){
+    super.initState();
+    list_things_types(context);
+    context.read<ThingType>().setThingType("type1");
+    // fetch_thing_type(context,widget.thing.thingName.toString());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // final thingsList = context.watch<ThingsList>().thingsList;
-    final List<String> thingsList =<String> ["one","two"];
+    final thingsList = context.watch<ThingsList>().thingsList;
     final thingTypes = context.watch<ThingType>().thingTypeList;
+    final thingType = context.watch<ThingType>().thingType;
     final msg = context.watch<Messages>().msg;
     return WillPopScope(
       onWillPop: () async {
@@ -73,10 +87,10 @@ class ManageThingActivity extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                "Thing Name: ${thing.thingName.toString()}",
+                "Thing Name: ${widget.thing.thingName.toString()}",
                 style: TextStyle(fontSize: 18),
               ),
-              Text("Thing Arn: ${thing.thingArn.toString()}"),
+              Text("Thing Arn: ${widget.thing.thingArn.toString()}"),
               Text(context.watch<Messages>().msg),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -96,6 +110,7 @@ class ManageThingActivity extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Text("Thing type"),
                     DropdownButton(
@@ -105,6 +120,7 @@ class ManageThingActivity extends StatelessWidget {
                           child: Text(value),
                         );
                       }).toList(),
+                      value: context.watch<ThingType>().thingType,
                       onChanged: (value) {
                         context.read<ThingType>().setThingType(value.toString());
                       },
@@ -112,6 +128,9 @@ class ManageThingActivity extends StatelessWidget {
                   ],
                 ),
               ),
+              ElevatedButton(onPressed: (){
+                saveThingType(context,widget.thing.thingName.toString(),thingType);
+              }, child: Text("Save thing type")),
             ],
           ),
         ),
@@ -120,17 +139,29 @@ class ManageThingActivity extends StatelessWidget {
   }
 
   ListThingsResponse listThingsResponse = new ListThingsResponse();
+
   AwsClientCredentials awsClientCredentials = new AwsClientCredentials(
       accessKey: "AKIA4DLDDHWDGTI74QPG",
       secretKey: "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");
+
   late IoT iot =
       new IoT(region: "us-east-1", credentials: awsClientCredentials);
+
+  void list_things_types(BuildContext context) async {
+    ListThingTypesResponse listThingTypesResponse =
+    ListThingTypesResponse();
+    listThingTypesResponse = await iot.listThingTypes();
+    listThingTypesResponse.thingTypes?.forEach((element) {
+      print("${element.thingTypeName} \n");
+      context.read<ThingType>().addThingType(element.thingTypeName.toString());
+    });
+  }
 
   void delete_thing(BuildContext context) async {
     bool deleted = true;
     try {
-      await iot.deleteThing(thingName: thing.thingName.toString());
-      context.read<ThingsList>().removeThing(thing);
+      await iot.deleteThing(thingName: widget.thing.thingName.toString());
+      context.read<ThingsList>().removeThing(widget.thing);
       Navigator.pop(context);
     } catch (e) {
       deleted = false;
@@ -180,7 +211,7 @@ class ManageThingActivity extends StatelessWidget {
       print('not connected');
     }
 
-    String topic = "/things/${thing.thingName.toString()}/shadow/get";
+    String topic = "/things/${widget.thing.thingName.toString()}/shadow/get";
     client.subscribe(topic, MqttQos.atLeastOnce);
 
     client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> c) {
@@ -272,7 +303,7 @@ class ManageThingActivity extends StatelessWidget {
       print('not connected');
     }
 
-    String topic = '/things/${thing.thingName.toString()}/shadow/get';
+    String topic = '/things/${widget.thing.thingName.toString()}/shadow/get';
     bool sent = true;
     final builder = MqttClientPayloadBuilder();
     builder.addString('{"temperature": "${controller.text}"}');
@@ -295,9 +326,23 @@ class ManageThingActivity extends StatelessWidget {
     controller.clear();
   }
 
-  DropdownMenuItem<String> buildMenuItem(String item)=>
-      DropdownMenuItem(
-          value: item,
-          child: Text(item),
-      );
+  void saveThingType(BuildContext context, String thing, String thingTypeName) async{
+    bool success = true;
+    try{
+      await iot.updateThing(thingName: thing,thingTypeName: thingTypeName);
+    }
+    catch(e){
+      success = false;
+      print("i am error${e}");
+    }
+    if(success){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Update successfuly"),
+      ));
+  } else {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  content: Text("Error in updating"),
+  ));
+  }
+  }
 }
